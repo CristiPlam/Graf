@@ -1,6 +1,9 @@
 import json
 from pprint import pprint
 import pickle
+from LexBFS import lex_bfs
+from A_star import a_star_search
+import math
 
 class Graph:
     def __init__(self, graph = None):
@@ -8,10 +11,12 @@ class Graph:
             self.edges = graph.edges
             self.vertices = graph.vertices
             self.vert_dict = graph.vert_dict
+            self.weights = graph.weights
         else:
             self.edges = []
             self.vertices = []
             self.vert_dict = {}
+            self.weights = []
 
     def get_vertices(self):
         return self.vertices
@@ -30,6 +35,12 @@ class Graph:
 
         self.vertices.append(vert)
 
+    def heuristic(self, start, end):
+        # Calculate Euclidean distance between the given vertex and the goal vertex
+        x1, y1 = start
+        x2, y2 = end
+        return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
     def get_num_vertices(self):
         return len(self.vertices)
 
@@ -42,7 +53,11 @@ class Graph:
             temp.append(line.split(" "))
 
         for line in temp:
-            self.edges.append((int(line[0]), int(line[1])))
+            if len(line) == 3:
+                self.edges.append((int(line[0]), int(line[1])))
+                self.weights.append(int(line[2]))
+            else:
+                self.edges.append((int(line[0]), int(line[1])))
 
 
     def create_vertices(self):
@@ -135,7 +150,22 @@ class Graph:
 
 
 
+if __name__ == '__main__':
+    file = 'D:/FACULTATE/MASTER/ANUL 2/SEMESTRUL 2/DUCOFFE/Graf/test graf.txt'
+    file2 = 'D:/FACULTATE/MASTER/ANUL 2/SEMESTRUL 2/DUCOFFE/Graf/facebook_combined.txt'
+    file3 = 'D:/FACULTATE/MASTER/ANUL 2/SEMESTRUL 2/DUCOFFE/Graf/test_graf_ponderat'
 
+
+
+    graph = Graph()
+
+    graph.read_file(file3)
+
+    graph.create_vertices()
+
+    # lex_bfs(graph.get_vert_dict())
+
+    a_star_search(graph, 1, 7)
 
 
 # graph = Graph()

@@ -1,7 +1,7 @@
 import pickle
 
 from graph import Graph
-from multiprocessing import Process, Lock
+from multiprocessing import Process, Lock, Pool
 from multiprocessing.managers import BaseManager
 def bfs(graph, start):
     visited = [False] * (len(graph.edges) + 1)
@@ -64,7 +64,36 @@ def pbfs(graph:Graph, node):
         print(shared_graph.get_vertices())
 
 
+"#################################################################################"
 
+def pooled_pbfs(graph:Graph, node):
+    visited = [False] * (len(graph.edges) + 1)
+
+    queue = []
+
+    queue.append(node)
+    visited[node] = True
+
+    with Pool(2) as p:  # create 2 processes
+        CustomManager.register("Graph", Graph)
+        with CustomManager() as m_d:
+            shared_graph = m_d.Graph(graph)  # create copy of graph in order to have all processes globally and make sure to carry over the changes to main
+
+            while queue:
+                node = queue.pop(0)
+                print(str(node))
+
+                for i in shared_graph.get_outward_neighbors(node):
+
+                    in_neigh = shared_graph.get_inward_neighbors(node)
+
+                    p.starmap(worker, [(shared_graph, vert, node) for vert in in_neigh])
+
+                    if visited[i] == False:
+                        queue.append(i)
+                        visited[i] = True
+
+            print(shared_graph.get_vertices())
 
 "#################################################################################"
 
@@ -80,7 +109,7 @@ if __name__ == '__main__':
 
     graph.create_vertices()
 
-    pbfs(graph, 0)
+    pooled_pbfs(graph, 0)
 
 
 
